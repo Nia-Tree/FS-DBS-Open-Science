@@ -1,0 +1,21 @@
+Curve audit
+Relative threshold: 20.0%
+Standard-error multiplier: 3
+
+figure1_encrypt_time.csv
+- FS-DBS: PASS
+- KMW23: PASS
+- Lee25-SS: PASS
+- AFI06: PASS
+- Li17-AAGKA: PASS
+- Zhang23-DAAGKA: PASS
+
+figure2_decrypt_time.csv
+- FS-DBS: PASS
+- KMW23: PASS
+- Lee25-SS: PASS
+- AFI06: PASS
+- Li17-AAGKA: PASS
+- Zhang23-DAAGKA: PASS
+
+Flagged points: 0

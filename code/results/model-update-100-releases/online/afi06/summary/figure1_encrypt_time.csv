@@ -1,0 +1,2 @@
+scheme,phase,axis_name,axis_value,samples,mean_ms,median_ms,stddev_ms,min_ms,max_ms,ci95_low_ms,ci95_high_ms
+"AFI06","Encryption / Signcryption","receiver_size",100,30,2.518376667,2.538950000,0.628275526,1.760100000,3.827800000,2.293551157,2.743202176

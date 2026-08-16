@@ -1,0 +1,18 @@
+Figure 6 experiment definition
+================================
+Authorized receivers: 100
+Registered slots: 1024
+Time-tree depth: 20
+Epoch policy: one state transition or re-agreement after every 10 completed model releases
+Maximum releases: 100
+Epoch events included at release r: floor(r/10)
+Critical path: one sender online operation, one representative receiver online operation, and the representative epoch path.
+Aggregate work: one sender online operation, 100 receiver online operations, and all epoch work, expressed as sequential single-core-equivalent computation.
+FS-DBS representative epoch path: provider KeyUpdate plus one receiver KeyUpdate.
+FS-DBS aggregate epoch work: provider KeyUpdate plus 100 receiver KeyUpdates.
+AFI06 representative/aggregate epoch work: one/100 receiver KeyUpdates.
+KMW23 and Lee25-SS: fresh independent receiver key pairs; this is an operational epoch-reset baseline, not a forward-security claim for the source schemes.
+Li17-AAGKA and Zhang23-DAAGKA: complete Agreement plus Enc.KeyGen and one/all Dec.KeyGen operations.
+All plotted values exclude common AES-256-GCM model-body processing and network transfer. End-to-end columns retain the measured common AEAD cost.
+Pairing preprocessing: disabled. Formula-level set/time preparation follows each implementation's audited online/offline boundary.
+Statistic: median wall-clock time from Release builds; all raw samples remain in the source result directories.

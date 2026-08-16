@@ -1,0 +1,6 @@
+scheme,tree_depth,samples,mean_ms,median_ms,stddev_ms,min_ms,max_ms,ci95_low_ms,ci95_high_ms,g1_scalar_multiplications,g2_scalar_multiplications,g1_group_additions,g2_group_additions,position
+AFI06,8,30,8.248783333,8.186550000,0.353677349,7.709400000,9.038500000,8.122221520,8.375345147,2,22,2,22,preorder_root_to_left_child_with_right_sibling
+AFI06,12,30,41.079906667,40.675650000,10.336645192,25.833400000,66.722400000,37.380985690,44.778827644,2,30,2,30,preorder_root_to_left_child_with_right_sibling
+AFI06,16,30,56.074546667,53.460700000,15.234540019,31.622800000,91.995700000,50.622936535,61.526156798,2,38,2,38,preorder_root_to_left_child_with_right_sibling
+AFI06,20,30,62.244226667,61.109900000,9.016311081,45.508800000,77.569800000,59.017781183,65.470672150,2,46,2,46,preorder_root_to_left_child_with_right_sibling
+AFI06,24,30,95.601040000,94.905750000,23.045905685,38.703500000,153.174800000,87.354168564,103.847911436,2,54,2,54,preorder_root_to_left_child_with_right_sibling

@@ -1,0 +1,7 @@
+scheme,event,aggregate_definition,representative_definition
+FS-DBS,KeyUpdate,provider plus all receiver evolving states,provider plus one receiver state
+AFI06,KeyUpdate,all receiver forward-secure states,one receiver state
+KMW23,EpochKeyGen,all receiver public/private key pairs,one receiver public/private key pair
+Lee25-SS,EpochKeyGen,all receiver public/private key pairs,one receiver public/private key pair
+Li17-AAGKA,Agreement,one Agreement and Enc.KeyGen plus every receiver Dec.KeyGen,one Agreement and Enc.KeyGen plus one receiver Dec.KeyGen
+Zhang23-DAAGKA,Agreement,one Agreement and Enc.KeyGen plus every receiver Dec.KeyGen,one Agreement and Enc.KeyGen plus one receiver Dec.KeyGen

@@ -1,0 +1,2 @@
+scheme,phase,axis_name,axis_value,samples,mean_ms,median_ms,stddev_ms,min_ms,max_ms,ci95_low_ms,ci95_high_ms
+"Li17-AAGKA","Decryption / Unsigncryption","receiver_size",100,30,2.776406667,2.774300000,0.073002352,2.573200000,3.003000000,2.750283110,2.802530223
