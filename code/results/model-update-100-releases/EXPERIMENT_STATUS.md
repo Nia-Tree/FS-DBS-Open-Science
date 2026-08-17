@@ -102,5 +102,3 @@ For FS-DBS at 100 releases, the one-sender/one-receiver end-to-end computation i
 - Every benchmark performs a correctness check before timing
 - All 12 formal epoch summaries have coefficient of variation below 4.4%
 - Figure PDF was rendered back through Poppler and inspected for clipping and overlap
-- `pdflatex` produced a 9-page paper PDF with the new figure
-- The repository still contains pre-existing bibliography defects: duplicate BibTeX entries and 11 unresolved citation keys. They are unrelated to this experiment.

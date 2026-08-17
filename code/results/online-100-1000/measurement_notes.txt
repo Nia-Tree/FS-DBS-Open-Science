@@ -29,5 +29,4 @@ individual timing points were spliced between batches. The accepted inputs are:
 All exploratory and rejected batches remain under results/phase19 through
 results/phase26. Figure 6 was recomputed in results/phase27-model-rerun-20260812
 using the verified 102,540,417-byte ResNet-50 state dictionary and the new
-|S|=100 public-key medians. The paper source and compiled paper PDF were not
-modified by this rerun.
+|S|=100 public-key medians.

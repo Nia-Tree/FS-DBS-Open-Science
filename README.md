@@ -1,6 +1,6 @@
 # FS-DBS Artifact
 
-This repository contains the implementation, measurements, and paper source.
+This repository contains the implementation and measurements.
 
 ## Layout
 
@@ -8,7 +8,6 @@ This repository contains the implementation, measurements, and paper source.
 - `code/scripts/`: validation and plotting scripts.
 - `code/results/`: raw samples and summary files.
 - `code/figures/`: performance figures.
-- `paper/`: LaTeX source and compiled paper.
 
 ## Build
 

@@ -1,4 +1,4 @@
-//! Implementation of the FS-DBS construction in `sigconf.tex`.
+//! Implementation of the FS-DBS construction.
 //!
 //! Paper mapping:
 //! - Construction section, `Setup` -> [`FsDbs::setup`]
