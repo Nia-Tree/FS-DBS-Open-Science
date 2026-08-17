@@ -1740,6 +1740,7 @@ network wall-clock latency.
 	\caption{Cumulative security-layer time for periodic model releases.}
 	\label{fig:model-update}
 \end{figure}
+\FloatBarrier
 \section{Conclusion}
 This paper presented FS-DBS for authenticated cloud-to-edge data distribution.
 It provides constant-size ciphertexts, and its online computation is independent
@@ -1752,6 +1753,12 @@ Our implementation over BLS12-381 shows that FS-DBS maintains low online and key
 Future work will consider adaptive security and constructions that avoid reliance on the random oracle model. Another direction is to strengthen the system model against imperfect key erasure and rollback of receiver states. We also plan to evaluate FS-DBS on heterogeneous edge devices and wide-area deployments to study computation, state-update, and network costs under practical deployment conditions.
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{Ref}
+\appendix
+\section{Open Science}
+The implementation, raw measurements, benchmark scripts, and plotting code are
+available at \url{https://anonymous.4open.science/r/FS-DBS-Open-Science-90C2/}.
+The repository includes the commands used to validate the reported results and
+recreate the figures.
 \end{document}
 \endinput
 %%
