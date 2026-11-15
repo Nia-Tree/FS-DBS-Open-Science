@@ -1,7 +1,0 @@
-scheme,state_kind,tree_depth,serialized_bytes,g1_elements,g2_elements,zp_elements
-FS-DBS,root evolving state,20,2224,0,23,0
-AFI06,root evolving state,20,2144,0,22,0
-KMW23,long-term secret key,20,56,1,0,0
-Lee25-SS,long-term secret key,20,56,1,0,0
-Li17-AAGKA,long-term secret key,20,240,1,2,0
-Zhang23-DAAGKA,long-term secret key,20,32,0,0,1

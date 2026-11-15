@@ -1,4 +1,0 @@
-Formal receiver sizes: 100,200,...,1000.
-The Zhang23 rerun uses a non-reporting receiver-size 99 conditioning point before formal points.
-Every timed sample is the arithmetic average of 10 complete online operations.
-The selection rule accepts the first complete scheme run passing the predeclared 20% plus 3-standard-error curve audit; no individual points are spliced.

@@ -1,21 +1,14 @@
 pub mod afi06;
-pub mod afi06_adapter;
-pub mod benchmark;
+pub mod afi06_cca;
 pub mod common;
-pub mod environment;
 pub mod fs_dbs;
-pub mod fs_dbs_adapter;
-pub mod gao25;
-pub mod gao25_adapter;
 pub mod kmw23;
 pub mod kmw23_adapter;
 pub mod lee25;
 pub mod lee25_ss_adapter;
-pub mod li17;
-pub mod li17_adapter;
-pub mod model_distribution;
 pub mod scheme_adapter;
-pub mod selvi09;
-pub mod selvi09_adapter;
+
+#[path = "corrected/baseline_h2c.rs"]
+mod baseline_h2c;
+#[path = "corrected/zhang23.rs"]
 pub mod zhang23;
-pub mod zhang23_adapter;

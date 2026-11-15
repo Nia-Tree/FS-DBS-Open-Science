@@ -206,3 +206,29 @@ mod tests {
         );
     }
 }
+
+
+// Fixture preparation only; original online methods and decapsulation RNG remain unchanged.
+impl Lee25SsAdapter {
+    pub fn quick_receiver_fixture_keygen(
+        &self, identity: usize, receiver: usize, rng: &mut rand::rngs::StdRng,
+    ) -> KeyPair<Lee25SsPublicKey, Lee25SsSecretKey> {
+        let mut validation_rng = rng.clone();
+        let (public, secret) = self.scheme.quick_receiver_fixture_keygen(identity, receiver, rng);
+        self.scheme.advance_fixture_validation_rng(rng);
+        if identity == 2 {
+            let (full_public, full_secret) = self.scheme.keygen(identity, &mut validation_rng);
+            assert!(self.scheme.is_valid(&full_public, &mut validation_rng), "complete Lee key must pass IsValid");
+            self.scheme.assert_quick_fixture_fields_equal(
+                &public, &secret, &full_public, &full_secret, receiver,
+            );
+            let mut projected_next = rng.clone();
+            assert_eq!(
+                rand::RngCore::next_u64(&mut projected_next),
+                rand::RngCore::next_u64(&mut validation_rng),
+                "Lee fixture must preserve keygen plus IsValid RNG consumption",
+            );
+        }
+        KeyPair { public, secret }
+    }
+}

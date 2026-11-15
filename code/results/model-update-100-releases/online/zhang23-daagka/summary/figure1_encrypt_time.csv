@@ -1,2 +1,0 @@
-scheme,phase,axis_name,axis_value,samples,mean_ms,median_ms,stddev_ms,min_ms,max_ms,ci95_low_ms,ci95_high_ms
-"Zhang23-DAAGKA","Encryption / Signcryption","receiver_size",100,30,1.715950000,1.725650000,0.066334465,1.561000000,1.819700000,1.692212517,1.739687483

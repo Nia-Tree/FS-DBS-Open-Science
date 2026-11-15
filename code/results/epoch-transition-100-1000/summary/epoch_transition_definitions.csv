@@ -1,7 +1,0 @@
-scheme,timed_epoch_transition,native_forward_security
-FS-DBS,one receiver KeyUpdate,yes
-AFI06,one receiver KeyUpdate,yes
-KMW23,one fresh receiver public/private key pair,no
-Lee25-SS,one fresh receiver public/private key pair,no
-Li17-AAGKA,complete Agreement and Enc.KeyGen plus one receiver Dec.KeyGen,agreement-based
-Zhang23-DAAGKA,complete Agreement and Enc.KeyGen plus one receiver Dec.KeyGen,agreement-based

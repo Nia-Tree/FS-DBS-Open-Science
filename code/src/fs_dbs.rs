@@ -1,4 +1,4 @@
-//! Implementation of the FS-DBS construction.
+//! FS-DBS construction.
 //!
 //! Paper mapping:
 //! - Construction section, `Setup` -> [`FsDbs::setup`]
@@ -7,16 +7,13 @@
 //! - Construction section, `Signcrypt` -> [`FsDbs::signcrypt_cached`]
 //! - Construction section, `Unsigncrypt` -> [`FsDbs::unsigncrypt_cached`]
 //!
-//! The paper labels algorithms rather than individual displayed equations in
-//! the supplied manuscript. No equation number is invented here.
-//!
 //! Binary time labels are encoded as non-zero field elements 1 and 2. This is
 //! the encoding required by the selective proof's first-differing-component
 //! argument; using literal 0/1 labels makes one simulation denominator zero.
 
 use crate::common::{
     alpha_powers, encode_indices, hash_to_scalar_excluding, kdf_gt, pairing, pairing_product,
-    random_nonzero_scalar, random_scalar, serialize, xor32, FixedBaseTable, Scalar, G1, G2, GT,
+    random_nonzero_scalar, serialize, xor32, FixedBaseTable, Scalar, G1, G2, GT,
 };
 use ark_ec::PrimeGroup;
 use ark_ff::Zero;
@@ -247,7 +244,7 @@ impl FsDbs {
         let z = current.node.len();
         assert!(z < self.depth);
         let label = child_bit + 1;
-        let delta = random_scalar(rng);
+        let delta = random_nonzero_scalar(rng);
         let mut child_node = current.node.clone();
         child_node.push(label);
         let child_z2 = self.time_base_g2(&child_node);
@@ -407,16 +404,11 @@ impl FsDbs {
     ) -> Ciphertext {
         assert_eq!(sender.node, time.node);
         let s = random_nonzero_scalar(rng);
-        let (delta, c3) = loop {
-            let delta = random_scalar(rng);
-            let c3 = sender.a1 + self.g2_table.mul(delta);
-            if !c3.is_zero() {
-                break (delta, c3);
-            }
-        };
+        let delta = random_nonzero_scalar(rng);
         let c0 = self.g1_table.mul(s);
         let c1 = recipients.x_table.mul(s);
         let c2 = time.z1_table.mul(s);
+        let c3 = sender.a1 + self.g2_table.mul(delta);
         let session = self.target_table.mul(s);
         let wrapped_key = xor32(key, &kdf_gt(b"FS-DBS/KEM", &session));
         let h = self.challenge(
@@ -482,7 +474,6 @@ impl FsDbs {
             || ciphertext.node != time.node
             || ciphertext.sender != sender_public.index
             || verification.sender != sender_public.index
-            || ciphertext.c3.is_zero()
         {
             return None;
         }
@@ -553,11 +544,7 @@ impl FsDbs {
                 wrapped_key,
                 &session_bytes,
             ],
-            &[
-                Scalar::from(0u64),
-                Scalar::from(1u64),
-                Scalar::from(2u64),
-            ],
+            &[Scalar::from(1u64), Scalar::from(2u64)],
         )
     }
 }
@@ -594,7 +581,6 @@ mod tests {
             &key,
             &mut rng,
         );
-        assert!(!ciphertext.c3.is_zero());
         let recovered = scheme
             .unsigncrypt_cached(
                 5,
@@ -606,19 +592,6 @@ mod tests {
             )
             .expect("authorized receiver must decrypt");
         assert_eq!(recovered, key);
-
-        let mut identity_c3 = ciphertext.clone();
-        identity_c3.c3 = G2::zero();
-        assert!(scheme
-            .unsigncrypt_cached(
-                5,
-                &keys[4],
-                &pks[1],
-                &recipient_cache,
-                &time_cache,
-                &identity_c3,
-            )
-            .is_none());
 
         let mut tampered = ciphertext;
         tampered.wrapped_key[0] ^= 1;

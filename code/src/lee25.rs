@@ -586,3 +586,53 @@ mod tests {
             .is_none());
     }
 }
+
+
+// Receiver-specific timing fixture. Unused cross coordinates remain placeholders;
+// this is not a complete public-key directory or a full IsValid measurement.
+impl Lee25Ss {
+    pub fn quick_receiver_fixture_keygen(
+        &self, index: usize, receiver: usize, rng: &mut impl RngCore,
+    ) -> (Lee25SsPublicKey, Lee25SsSecretKey) {
+        assert!((1..=self.core.n).contains(&index));
+        assert!((1..=self.core.n).contains(&receiver));
+        let gamma = random_nonzero_scalar(rng);
+        let secret_index = self.core.l + 2 - index;
+        let cross_index = self.core.l + 2 - receiver;
+        let mut cross = vec![G1::zero(); self.core.l + 2];
+        if cross_index != secret_index { cross[cross_index] = self.core.a[cross_index] * gamma; }
+        let public = SsPublicKey {
+            index, v: self.core.g1 * gamma, v_hat: self.core.g2 * gamma, cross,
+        };
+        let secret = SsSecretKey {
+            index, k: self.core.g1 * (self.core.powers[secret_index] * gamma),
+        };
+        (
+            Lee25SsPublicKey { index, inner: public },
+            Lee25SsSecretKey { index, inner: secret },
+        )
+    }
+
+    // Original successful ss_is_valid consumes one delta0 and l-1 deltas.
+    // Consume exactly those random draws; no public-key validation is performed.
+    pub fn advance_fixture_validation_rng(&self, rng: &mut impl RngCore) {
+        for _ in 0..self.core.l { let _ = rng.next_u32(); }
+    }
+
+    pub fn assert_quick_fixture_fields_equal(
+        &self,
+        projected_public: &Lee25SsPublicKey, projected_secret: &Lee25SsSecretKey,
+        full_public: &Lee25SsPublicKey, full_secret: &Lee25SsSecretKey,
+        receiver: usize,
+    ) {
+        assert_eq!(projected_public.index, full_public.index);
+        assert_eq!(projected_public.inner.index, full_public.inner.index);
+        assert_eq!(projected_public.inner.v, full_public.inner.v);
+        assert_eq!(projected_public.inner.v_hat, full_public.inner.v_hat);
+        assert_eq!(projected_public.inner.cross.len(), self.core.l + 2);
+        assert_eq!(projected_public.inner.cross.len(), full_public.inner.cross.len());
+        let cross_index = self.core.l + 2 - receiver;
+        assert_eq!(projected_public.inner.cross[cross_index], full_public.inner.cross[cross_index]);
+        assert_eq!(projected_secret.serialized_bytes(), full_secret.serialized_bytes());
+    }
+}

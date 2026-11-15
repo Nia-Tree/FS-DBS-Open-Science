@@ -1,4 +1,0 @@
-Model filename: resnet50-11ad3fa6.pth
-Model bytes: 102540417
-Encrypted bytes: 102540433
-SHA-256: 11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca

@@ -1,2 +1,0 @@
-scheme,phase,axis_name,axis_value,samples,mean_ms,median_ms,stddev_ms,min_ms,max_ms,ci95_low_ms,ci95_high_ms
-"AFI06","Decryption / Unsigncryption","receiver_size",100,30,5.429643333,5.573050000,1.164693231,3.159200000,7.432500000,5.012863213,5.846423454

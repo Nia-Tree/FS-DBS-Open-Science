@@ -248,3 +248,31 @@ mod tests {
         assert_eq!(scheme.decrypt_cached(2, &cache, &ciphertext), None);
     }
 }
+
+
+// Diagnostic receiver-specific fixture only. All original online methods remain unchanged.
+impl Kmw23 {
+    pub fn quick_receiver_fixture_keygen(&self, index: usize, receiver: usize, rng: &mut impl RngCore) -> User {
+        assert!((1..=self.n).contains(&index));
+        assert!((1..=self.n).contains(&receiver));
+        let r = random_nonzero_scalar(rng);
+        let secret_index = self.n + 1 - index;
+        let cross_index = self.n + 1 - receiver;
+        let mut cross = vec![G1::zero(); self.n + 1];
+        if cross_index != secret_index { cross[cross_index] = self.a[cross_index] * r; }
+        User {
+            public: UserPublicKey { index, t: self.g1 * r, cross },
+            secret: UserSecretKey { index, value: self.g1 * (r * self.powers[secret_index]) },
+        }
+    }
+
+    pub fn assert_quick_fixture_fields_equal(&self, projected: &User, full: &User, receiver: usize) {
+        assert_eq!(projected.public.index, full.public.index);
+        assert_eq!(projected.public.t, full.public.t);
+        assert_eq!(projected.public.cross.len(), self.n + 1);
+        assert_eq!(projected.public.cross.len(), full.public.cross.len());
+        let cross_index = self.n + 1 - receiver;
+        assert_eq!(projected.public.cross[cross_index], full.public.cross[cross_index]);
+        assert_eq!(projected.secret.serialized_bytes(), full.secret.serialized_bytes());
+    }
+}

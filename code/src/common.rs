@@ -10,56 +10,19 @@ pub type G2 = G2Projective;
 pub type GT = ark_ec::pairing::PairingOutput<Bls12_381>;
 pub type Scalar = Fr;
 
+// Store the base and use ordinary scalar multiplication.
 #[derive(Clone)]
 pub struct FixedBaseTable<G>
-where
-    G: PrimeGroup<ScalarField = Scalar> + Copy,
-{
-    window: usize,
-    rows: Vec<Vec<G>>,
-}
+where G: PrimeGroup<ScalarField = Scalar> + Copy,
+{ base: G }
 
 impl<G> FixedBaseTable<G>
-where
-    G: PrimeGroup<ScalarField = Scalar> + Copy,
+where G: PrimeGroup<ScalarField = Scalar> + Copy,
 {
-    pub fn new(base: G) -> Self {
-        const WINDOW: usize = 5;
-        let windows = (Scalar::MODULUS_BIT_SIZE as usize).div_ceil(WINDOW);
-        let mut rows = Vec::with_capacity(windows);
-        let mut window_base = base;
-        for _ in 0..windows {
-            let mut row = Vec::with_capacity(1 << WINDOW);
-            row.push(G::zero());
-            for multiple in 1..(1 << WINDOW) {
-                row.push(row[multiple - 1] + window_base);
-            }
-            rows.push(row);
-            for _ in 0..WINDOW {
-                window_base.double_in_place();
-            }
-        }
-        Self {
-            window: WINDOW,
-            rows,
-        }
-    }
-
-    pub fn mul(&self, scalar: Scalar) -> G {
-        let bits = scalar.into_bigint().to_bits_le();
-        let mut result = G::zero();
-        for (window_index, row) in self.rows.iter().enumerate() {
-            let start = window_index * self.window;
-            let mut digit = 0usize;
-            for bit in 0..self.window {
-                if bits.get(start + bit).copied().unwrap_or(false) {
-                    digit |= 1 << bit;
-                }
-            }
-            result += row[digit];
-        }
-        result
-    }
+    pub fn new(base:G)->Self {Self{base}}
+    pub fn mul(&self,scalar:Scalar)->G {self.base*scalar}
+    pub fn element_count(&self)->usize {1}
+    pub fn estimated_group_ram_bytes(&self)->usize {std::mem::size_of::<G>()}
 }
 
 pub fn pairing(a: G1, b: G2) -> GT {

@@ -15,7 +15,7 @@
 //!   key, without changing the three source header coordinates.
 
 use crate::common::{
-    alpha_powers, kdf_gt, pairing, pairing_product, random_nonzero_scalar, serialize, xor32,
+    alpha_powers, hash_bytes, kdf_gt, pairing, pairing_product, random_nonzero_scalar, serialize, xor32,
     Scalar, G1, G2, GT,
 };
 use ark_ec::PrimeGroup;
@@ -101,10 +101,10 @@ pub struct RecipientCache {
 
 #[derive(Clone)]
 pub struct Ciphertext {
-    c0: G1,
-    c1: G1,
-    c2: G1,
-    wrapped_key: [u8; 32],
+    pub(crate) c0: G1,
+    pub(crate) c1: G1,
+    pub(crate) c2: G1,
+    pub(crate) wrapped_key: [u8; 32],
 }
 
 impl Ciphertext {
@@ -134,6 +134,99 @@ pub struct Afi06 {
 }
 
 impl Afi06 {
+    /// Fingerprint of the concrete public setup, used by the separate CHK wrapper.
+    pub(crate) fn parameter_fingerprint(&self) -> [u8; 32] {
+        let mut encoded = Vec::new();
+        encoded.extend_from_slice(&(self.n as u64).to_le_bytes());
+        encoded.extend_from_slice(&(self.depth as u64).to_le_bytes());
+        for point in &self.g1_powers { encoded.extend_from_slice(&serialize(point)); }
+        for point in &self.g2_powers { encoded.extend_from_slice(&serialize(point)); }
+        encoded.extend_from_slice(&serialize(&self.v1));
+        encoded.extend_from_slice(&serialize(&self.y1));
+        encoded.extend_from_slice(&serialize(&self.y2));
+        hash_bytes(b"AFI06-CHK/public-parameters/v1", &[&encoded])
+    }
+
+    /// Jump to a time node while retaining precisely the future preorder frontier.
+    /// This skips discarded subtrees, rather than iterating their time periods.
+    pub(crate) fn state_at_node_limited(
+        &self, index: usize, node: &[u8], period_depth: usize, rng: &mut impl RngCore,
+    ) -> ForwardSecureState {
+        assert!(period_depth <= self.depth && node.len() <= period_depth);
+        assert!(node.iter().all(|label| *label == 1 || *label == 2));
+        let mut state = self.initial_state(index, rng);
+        for &label in node {
+            if label == 1 {
+                state.future_right_siblings.push(self.derive(&state.current, 1, rng));
+            }
+            state.current = self.derive(&state.current, label - 1, rng);
+        }
+        state
+    }
+
+    /// Preorder update with a reserved HICBE level excluded from the time tree.
+    pub(crate) fn update_state_limited(
+        &self, state: &ForwardSecureState, period_depth: usize, rng: &mut impl RngCore,
+    ) -> Option<ForwardSecureState> {
+        assert!(period_depth <= self.depth && state.current.node.len() <= period_depth);
+        let mut future = state.future_right_siblings.clone();
+        let current = if state.current.node.len() < period_depth {
+            let right = self.derive(&state.current, 1, rng);
+            let left = self.derive(&state.current, 0, rng);
+            future.push(right);
+            left
+        } else {
+            future.pop()?
+        };
+        Some(ForwardSecureState { current, future_right_siblings: future })
+    }
+
+    /// Encrypt at the reserved last identity level. Unused time levels have label 0.
+    /// The CPA API below is unchanged; only the CHK wrapper calls this method.
+    pub(crate) fn encrypt_chk_cached(
+        &self, recipients: &RecipientCache, time: &TimeCache, verification_id: Scalar,
+        context: &[u8], key: &[u8; 32], rng: &mut impl RngCore,
+    ) -> Ciphertext {
+        assert!(time.node.len() < self.depth);
+        let identity = time.identity1 + self.g1_powers[self.n + 1 - self.depth] * verification_id;
+        let t = random_nonzero_scalar(rng);
+        let session = self.target_base * t;
+        let mut ciphertext = Ciphertext {
+            c0: self.g1 * t, c1: recipients.encrypt_base * t, c2: identity * t,
+            wrapped_key: [0; 32],
+        };
+        let mask = Self::chk_mask(&session, context, &ciphertext);
+        ciphertext.wrapped_key = xor32(key, &mask);
+        ciphertext
+    }
+
+    /// Internal last-level delegation uses delta=0: a0'=a0+b_last*H(vk), a1'=a1.
+    /// The delegated key is never released. This avoids needless rerandomization.
+    pub(crate) fn decrypt_chk_cached(
+        &self, receiver: usize, receiver_key: &UserKey, recipients: &RecipientCache,
+        time: &TimeCache, verification_id: Scalar, context: &[u8], ciphertext: &Ciphertext,
+    ) -> Option<[u8; 32]> {
+        if receiver_key.index != receiver || receiver_key.node != time.node
+            || time.node.len() >= self.depth || !recipients.recipients.contains(&receiver) {
+            return None;
+        }
+        let term = recipients.receiver_terms.get(receiver).and_then(|entry| *entry)?
+            + receiver_key.helpers[self.depth] * verification_id;
+        let session = pairing_product(&[
+            (ciphertext.c1, self.g2_powers[receiver]),
+            (ciphertext.c2, receiver_key.a1),
+            (-ciphertext.c0, term),
+        ]);
+        Some(xor32(&ciphertext.wrapped_key, &Self::chk_mask(&session, context, ciphertext)))
+    }
+
+    fn chk_mask(session: &GT, context: &[u8], ciphertext: &Ciphertext) -> [u8; 32] {
+        hash_bytes(b"AFI06-CHK/wrapped-key/v1", &[
+            &serialize(session), context, &serialize(&ciphertext.c0),
+            &serialize(&ciphertext.c1), &serialize(&ciphertext.c2),
+        ])
+    }
+
     pub fn setup(n: usize, depth: usize, rng: &mut impl RngCore) -> Self {
         assert!(n > depth);
         let g1 = G1::generator();

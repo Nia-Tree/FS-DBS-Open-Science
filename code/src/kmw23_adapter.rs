@@ -167,3 +167,25 @@ mod tests {
         ));
     }
 }
+
+
+// Fixture preparation only; original encrypt/decrypt paths above are unchanged.
+impl Kmw23Adapter {
+    pub fn quick_receiver_fixture_keygen(
+        &self, identity: usize, receiver: usize, rng: &mut rand::rngs::StdRng,
+    ) -> KeyPair<UserPublicKey, UserSecretKey> {
+        let mut validation_rng = rng.clone();
+        let user = self.scheme.quick_receiver_fixture_keygen(identity, receiver, rng);
+        if identity == 2 {
+            let full = self.scheme.keygen(identity, &mut validation_rng);
+            self.scheme.assert_quick_fixture_fields_equal(&user, &full, receiver);
+            let mut projected_next = rng.clone();
+            assert_eq!(
+                rand::RngCore::next_u64(&mut projected_next),
+                rand::RngCore::next_u64(&mut validation_rng),
+                "KMW fixture must preserve RNG consumption",
+            );
+        }
+        KeyPair { public: user.public, secret: user.secret }
+    }
+}

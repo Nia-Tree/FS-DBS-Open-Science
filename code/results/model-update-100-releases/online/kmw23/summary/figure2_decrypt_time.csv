@@ -1,2 +1,0 @@
-scheme,phase,axis_name,axis_value,samples,mean_ms,median_ms,stddev_ms,min_ms,max_ms,ci95_low_ms,ci95_high_ms
-"KMW23","Decryption / Unsigncryption","receiver_size",100,30,4.886413333,4.547500000,1.489193099,3.010900000,10.558000000,4.353512427,5.419314240

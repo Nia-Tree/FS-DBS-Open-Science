@@ -1,5 +1,0 @@
-component,median_ms
-aes_encrypt_ms,46.0138
-aes_decrypt_ms,45.39535
-signature_ms,0.013
-verification_ms,0.0234

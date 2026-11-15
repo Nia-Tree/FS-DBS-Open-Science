@@ -1,2 +1,0 @@
-scheme,phase,axis_name,axis_value,samples,mean_ms,median_ms,stddev_ms,min_ms,max_ms,ci95_low_ms,ci95_high_ms
-"Lee25-SS","Encryption / Signcryption","receiver_size",100,30,4.756670000,4.522100000,1.193445291,3.012400000,9.181700000,4.329601088,5.183738912
